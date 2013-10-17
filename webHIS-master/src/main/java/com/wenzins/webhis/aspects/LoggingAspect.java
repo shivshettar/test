@@ -10,6 +10,8 @@ public class LoggingAspect {
 	Logger logger = Logger.getRootLogger();
 
 	@Before("execution(* com.wenzins.webhis..*.*(..))")
+	
+	
 	public void logBefore(JoinPoint joinPoint) {
 		logger.info("logBefore() is running!");
 		logger.info("hijacked : " + joinPoint.getSignature().getName());
