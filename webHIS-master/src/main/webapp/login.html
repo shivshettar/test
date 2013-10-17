@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wenzins HIMS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="jquery/mobile/1.3.2/jquery.mobile-1.3.2.css" />
+<link rel="stylesheet" href="jquery/mobile/jqm-docs.css" />
+
+<script src="jquery/1.10.2/jquery-1.10.2.js"></script>
+<script src="jquery/mobile/1.3.2/jquery.mobile-1.3.2.js"></script>
+<script src="json/json2.js"></script>
+<script src="form2js/form2js.js"></script>
+<script>
+	
+$(document).ready(
+		function() {
+			//alert("here");
+			$('#sigin').submit(
+					function(event) {
+						/* stop form from submitting normally */
+						event.preventDefault();
+						var uname=$("#login_username").val();
+						var pass=$("#login_passsword").val();
+						var count=0;
+						 $.get($(this).attr('action'),function(datata){
+							 $.each(datata,function(index,data1)//check for userName and password in the list
+							 {
+								if(data1['userName'] == uname && data1['password'] == pass)
+								{
+									count++;// if user name and password match
+									window.location.replace("registration.html"); // go to Patient Registration Page
+							       return false;
+								}
+						 });
+						 if(count == 0){ //Alert if not a valid user
+							alert("Not a registered User");
+						}
+					 });
+						
+				});
+			});
+</script>
+</head>
+
+
+<body>
+<div data-role="page"  class="type-interior">
+
+		<div data-role="header" data-theme="f">
+			<h1>Wenzins Health Information Management System</h1>
+		</div>
+		<!-- /header -->
+
+		<div data-role="content">
+			<div class="content-primary"> <!-- get User name -->
+				<form id="sigin" method="POST" action="login/list">
+					<div class="ui-grid-b ui-responsive">
+						<div class="ui-block-a">
+							<div data-role="fieldcontain" align="left" >
+							<label for="login_uname" class="ui-hidden-accessible">User Name:</label>
+									<input type="text" value="" name="userName" id="login_username" placeholder="Username" required="" maxlength="10"
+									 class="ui-input-text ui-body-c">
+							</div>
+						</div>
+							
+						<div class="ui-block-a"><!-- get Password -->
+							<div data-role="fieldcontain" align="left" >
+							<label for="login_pswd" class="ui-hidden-accessible">Password:</label>
+									<input type="password" value="" name="password" id="login_passsword" placeholder="Password" required="" maxlength="10" class="ui-input-text ui-body-c">
+							</div>
+						</div>
+									
+					</div>				
+					
+					<div data-role="fieldcontain"> <!--  Submit -->
+						<div class="ui-grid-b ui-responsive">
+							<div class="ui-block-a">
+							<input type="submit" value="Login" />
+							</div>
+						</div>
+					</div>
+					
+								
+				</form>
+			</div>
+			<!-- content-primary -->
+			
+		</div>	
+			
+	</div>
+<!-- page-->
+</body>
+</html>

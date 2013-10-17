@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Wenzins HIMS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="jquery/mobile/1.3.2/jquery.mobile-1.3.2.css" />
+<link rel="stylesheet" href="jquery/mobile/jqm-docs.css" />
+
+
+<script src="jquery/1.7.2/jquery-1.7.2.js"></script>
+<script src="jquery/mobile/1.3.2/jquery.mobile-1.3.2.js"></script>
+<script src="json/json2.js"></script>
+<script src="form2js/form2js.js"></script>
+<script>
+
+$.postJSON = function(url, data, callback, dataType) {
+	return jQuery.ajax({
+		'type' : 'POST',
+		'url' : url,
+		'contentType' : 'application/json',
+		'data' : data,
+		'dataType' : dataType,
+		'success' : callback
+	});
+};
+
+$(document).ready(
+		function() {
+			alert("welcome");
+			 $.get("doctor/listdep",function(datata){
+				 $.each(datata,function(index,data1){
+					 var optTempl = '<option value="' +data1['depId']+ '">'+data1['departmentName']+'</option>'; 
+					
+					$('#dept_type').append(optTempl);
+
+
+				 });
+					
+			
+			 });
+			 
+			 $.get("doctor/list",function(datata){
+				 $.each(datata,function(index,data1){
+					 var optTempl = '<option value="' +data1['doctorId']+ '">'+data1['doctorName']+'</option>'; 
+					
+					$('#doctor_name').append(optTempl);
+
+
+				 });
+					
+			
+			 });
+		});
+var submitName;
+var flag = 0;
+function submitForm (form) //called once submit form or add doctor details
+{
+  if (submitName == "Send")//to send details to database
+  {
+	  /* stop form from submitting normally */
+	  	event.preventDefault();
+	  	var tDate = new Date($("#to_date").val());
+		var fDate = new Date($("#from_date").val());
+		var diff = tDate - fDate;
+		if(diff < 0)
+			{	alert("Please select from date to be earlier than the to date..exiting");   
+				document.getElementById('from_date').value = "";
+				document.getElementById('to_date').value = "";
+				return false;
+			}
+		var fTime = ($("#from_time").val());
+	  	var tTime = ($("#to_time").val());
+	  	var diffTime=((Number(tTime.split(':')[0])*3600+Number(tTime.split(':')[1])*60)*1000 - (Number(fTime.split(':')[0])*3600+Number(fTime.split(':')[1])*60)*1000);
+	  	if(diffTime < 0)
+			{
+	  			alert("Please select from time to be earlier than the to time..exiting");
+	  			document.getElementById('from_time').value = "";
+				document.getElementById('to_time').value = "";
+				return false;
+			}
+		var formData = form2js('doctorDetailsFrom');
+		var data = JSON.stringify(formData); 
+		alert(data);
+		var xhr = $.postJSON($('#doctorDetailsFrom').attr('action'), data,
+		function(respData, txtStatus, jqXHR) {
+		alert(txtStatus + " - Doctor details added: " + respData);} , "json");
+		xhr.fail(function(jqXHR, txtStatus, error) {
+		alert(txtStatus + ": Failed - " + error);
+		});
+  }
+  else if ((submitName == "+ add" ) && (flag == 0))//to add a doctor and only on(c)e
+  {
+	  	var box=document.createElement("input");
+		box.name="doctorName";//name of the input element same as the dropdown option
+		box.id="doctor_name";
+		//alert(box.name);
+		document.getElementById("main").appendChild(box);//add the input box after the Main 
+		flag = 1;
+  } 
+
+  return false;
+}
+		
+function setSubmit (button)//used to differenciate between two buttons
+{
+  submitName = button.value;
+}
+			
+</script>
+</head>
+<body>
+	<div data-role="page" id="doctor_details" class="type-interior">
+
+		<div data-role="header" data-theme="f">
+			<h1>Wenzins Health Information Management System</h1>
+		</div>
+		<!-- /header -->
+<h2><center>Add Doctor or Edit Doctor Details</center></h2>
+
+		<div data-role="content">
+
+				<form id="doctorDetailsFrom" method="POST" action="doctor/insert"  onsubmit="return submitForm(this)">
+
+				<div class="ui-grid-b ui-responsive" >
+					<div class="ui-block-a" data-role="fieldcontain">
+					
+						<label for="emer_con_rel_type" class="ui-hidden-accessible" class="select">Select Department</label>
+							<select name="departmentName"
+											id="dept_type" class="optional" value="">
+											<option value="">-- Select Department --</option>
+											
+							</select>
+					</div>
+					
+					<div class="ui-block-a" data-role="fieldcontain">
+						<label for="emer_con_rel_type" class="ui-hidden-accessible" class="select">Select Department</label>
+							<select name="doctorName"
+											id="doctor_name" class="optional" value="">
+											<option value="">-- Select Doctor Name --</option>
+																		</select>
+					
+				</div>
+					
+					<div data-role="fieldcontain" id = "main">
+						<div class="ui-block-a">
+  						<input type="submit" value="+ add" onclick="setSubmit(this)" />
+						</div>
+					</div>
+				</div>
+	
+	
+
+			
+						<div class="ui-grid-b ui-responsive">
+							<div class="ui-block-b">
+									<div data-role="fieldcontain" align="left">
+										<label for="from_date" class="ui-hidden-accessible">From Date:</label> 
+										<input type="date" data-clear-btn="false" name="fromDate" id="from_date" value=""
+											placeholder="Date (dd/mm/yyyy)" class="optional"/>
+									</div>
+							</div>
+		
+							<div class="ui-block-b">
+									<div data-role="fieldcontain" align="left">
+										<label for="to_date" class="ui-hidden-accessible">To Date:</label> 
+										<input type="date" data-clear-btn="false" name="toDate" id="to_date" value=""
+											placeholder="Date (dd/mm/yyyy)" class="optional"/>
+									</div>
+							</div>	
+					</div>
+			
+				<div class="ui-grid-b ui-responsive" >
+					<div class="ui-block-a">
+							<div data-role="fieldcontain" align="left">
+								<label for="from_time" class="ui-hidden-accessible">From Time:</label>
+								<input type="time" data-clear-btn="false"
+								name="fromTime" id="from_time" value=""
+								placeholder="From Time (hh:mm)" class="optional"/>
+							</div>
+					</div>
+					<div class="ui-block-b">
+							<div data-role="fieldcontain" align="left">
+								<label for="to_time" class="ui-hidden-accessible">To Time:</label>
+								<input type="time" data-clear-btn="false"
+								name="toTime" id="to_time" value=""
+								placeholder="To Time (hh:mm)" class="optional"/>
+							</div>
+					</div>
+					
+					
+					
+				</div>
+		
+		<div data-role="fieldcontain">
+				<div class="ui-grid-b ui-responsive">
+					<div class="ui-block-a">
+  							<input type="submit" value="Send" onclick="setSubmit(this)"/>
+					</div>
+				</div>
+		</div>
+	</form>			
+			
+				
+				
+		</div>
+		<!-- /content -->
+
+	</div>
+	<!-- /page -->
+
+</body>
+
+</html>
